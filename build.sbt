@@ -1,5 +1,3 @@
-import bintray.Keys._
-
 sbtPlugin := true
 
 name := "sbt-javaversioncheck"
@@ -16,13 +14,9 @@ scalacOptions := Seq("-deprecation", "-unchecked")
 
 // --> bintray
 
-Seq(bintrayPublishSettings:_*)
+bintrayRepository := "scala"
 
-repository in bintray := "scala"
-
-bintrayOrganization in bintray := Some("agilogy")
-
-packageLabels in bintray := Seq("scala")
+bintrayOrganization := Some("agilogy")
 
 licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
 
