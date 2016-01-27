@@ -11,8 +11,8 @@ object JavaVersionCheckPlugin extends sbt.AutoPlugin {
 //  val defaultJavaVersion: String = "1.8"
 
   object autoImport {
-    lazy val javaVersion = settingKey[String]("java version prefix required by javaVersionCheck")
-    lazy val javaVersionCheck = taskKey[String]("checks the Java version vs. javaVersion, returns actual version")
+    lazy val javaVersion = settingKey[String]("java version required by the project")
+    lazy val javaVersionCheck = taskKey[String]("checks the current java specification version vs. the javaVersion setting, returns the current specification version")
   }
 
   import autoImport._
@@ -42,7 +42,7 @@ object JavaVersionCheck {
 
   def check(requiredJavaVersion: String, javaSpecificationVersion:String):String = {
     if(!isOk(requiredJavaVersion,javaSpecificationVersion)){
-      sys.error(s"javac version $javaSpecificationVersion can't be used to compile, required java version is $requiredJavaVersion (due to javaVersion setting)")
+      sys.error(s"The current java.specification.version $javaSpecificationVersion can't be used, the required version is $requiredJavaVersion (javaVersion setting)")
     }else {
       javaSpecificationVersion
     }
