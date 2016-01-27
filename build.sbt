@@ -14,7 +14,9 @@ scalacOptions := Seq("-deprecation", "-unchecked")
 
 // --> bintray
 
-bintrayRepository := "scala"
+publishMavenStyle := true
+
+bintrayRepository := "maven"
 
 bintrayOrganization := Some("agilogy")
 
