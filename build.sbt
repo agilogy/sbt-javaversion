@@ -1,8 +1,10 @@
+import bintray.Keys._
+
 sbtPlugin := true
 
 name := "sbt-javaversioncheck"
 
-organization := "com.typesafe.sbt"
+organization := "com.agilogy"
 
 version := "0.1.0"
 
@@ -12,11 +14,24 @@ licenses := Seq("MIT License" -> url("http://opensource.org/licenses/MIT"))
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 
-publishMavenStyle := false
+// --> bintray
+
+Seq(bintrayPublishSettings:_*)
+
+repository in bintray := "scala"
+
+bintrayOrganization in bintray := Some("agilogy")
+
+packageLabels in bintray := Seq("scala")
+
+licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0.html"))
+
+// <-- bintray
+
+publishMavenStyle := isSnapshot.value
 
 publishTo := {
-  if (isSnapshot.value) Some(Resolver.sbtPluginRepo("snapshots"))
-  else Some(Resolver.sbtPluginRepo("releases"))
+  val nexus = "http://188.166.95.201:8081/content/repositories/snapshots"
+  if (isSnapshot.value) Some("snapshots"  at nexus)
+  else publishTo.value
 }
-
-credentials += Credentials(Path.userHome / ".ivy2" / ".sbtcredentials")
