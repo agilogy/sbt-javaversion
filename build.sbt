@@ -4,7 +4,7 @@ organization := "com.agilogy"
 
 name := "sbt-javaversion"
 
-version := "0.1.0"
+version := "0.2.0"
 
 description := "sbt plugin to check Java version"
 
@@ -12,11 +12,14 @@ licenses := Seq("MIT License" -> url("http://opensource.org/licenses/MIT"))
 
 scalacOptions := Seq("-deprecation", "-unchecked")
 
+libraryDependencies ++= Seq(
+  "org.scalatest" %% "scalatest" % "2.1.3" % "test"
+)
 // --> bintray
 
-publishMavenStyle := true
+publishMavenStyle := false
 
-bintrayRepository := "maven"
+bintrayRepository := "sbt-plugins"
 
 bintrayOrganization := Some("agilogy")
 

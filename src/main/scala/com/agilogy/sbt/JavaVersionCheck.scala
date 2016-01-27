@@ -5,6 +5,8 @@ import Keys._
 import compiler.JavaTool
 import plugins.JvmPlugin
 
+import scala.util.Try
+
 object JavaVersionCheckPlugin extends sbt.AutoPlugin {
 //  val defaultJavaVersion: String = "1.8"
 
@@ -27,7 +29,7 @@ object JavaVersionCheckPlugin extends sbt.AutoPlugin {
     javaVersionCheck := {
       val log = streams.value.log
       val javac = (compileInputs in (Compile, compile)).value.compilers.javac
-      JavaVersionCheck((javaVersion in javaVersionCheck)/*.or(failJavaVersionDefinition)*/.value, javac, log)
+      JavaVersionCheck.check((javaVersion in javaVersionCheck).value, sys.props("java.specification.version"))
     },
     // we DO want to require the version check just for compile.
     compile in Compile <<= (compile in Compile).dependsOn(javaVersionCheck in Compile),
@@ -37,29 +39,25 @@ object JavaVersionCheckPlugin extends sbt.AutoPlugin {
 }
 
 object JavaVersionCheck {
-  def apply(declaredJavaVersion: String, javac: JavaTool, realLog: Logger): String = {
-    val captureVersionLog = new Logger() {
-      var captured: Option[String] = None
-       def log(level: Level.Value, message: => String): Unit = {
-         val m = message
-         if (level == Level.Warn && m.startsWith("javac ")) {
-           captured = Some(m.substring("javac ".length).trim)
-         } else {
-           realLog.log(level, m)
-         }
-       }
-      def success(message: => String): Unit = realLog.success(message)
-      def trace(t: => Throwable): Unit = realLog.trace(t)
+
+  def check(requiredJavaVersion: String, javaSpecificationVersion:String):String = {
+    if(!isOk(requiredJavaVersion,javaSpecificationVersion)){
+      sys.error(s"javac version $javaSpecificationVersion can't be used to compile, required java version is $requiredJavaVersion (due to javaVersion setting)")
+    }else {
+      javaSpecificationVersion
     }
-    javac(sources = Nil,
-      classpath = Nil,
-      outputDirectory = file("."),
-      options = Seq("-version"))(captureVersionLog)
-    val actualJavaVersion: String = captureVersionLog.captured getOrElse {sys.error("failed to get or parse the output of javac -version")}
-    if (!actualJavaVersion.startsWith(declaredJavaVersion)) {
-      sys.error(s"javac version $actualJavaVersion can't be used to compile, java version is expected to start with $declaredJavaVersion (due to javaVersion setting)")
+  }
+
+  def isOk(requiredJavaVersion: String, javaSpecificationVersion:String): Boolean = {
+    val requiredParts = Try(requiredJavaVersion.split("""[\._]""").map(_.toInt)).getOrElse(sys.error(s"Illegal required java version $requiredJavaVersion"))
+    val javaSpecificationParts = Try(javaSpecificationVersion.split("""[\._]""").map(_.toInt)).getOrElse(sys.error(s"Illegal actual java version $javaSpecificationVersion"))
+    isOk(requiredParts, javaSpecificationParts)
+  }
+
+  def isOk(requiredJavaVersion:Array[Int], usedJavaVersion:Array[Int]):Boolean = {
+    usedJavaVersion.zip(requiredJavaVersion).foldRight[Boolean](requiredJavaVersion.length <= usedJavaVersion.length){
+      case ((used,req),acc) => (used > req) || (used == req && acc)
     }
-    actualJavaVersion
   }
 }
 
