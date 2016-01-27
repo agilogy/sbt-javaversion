@@ -1,8 +1,8 @@
 sbtPlugin := true
 
-name := "sbt-javaversioncheck"
-
 organization := "com.agilogy"
+
+name := "sbt-javaversion"
 
 version := "0.1.0"
 
