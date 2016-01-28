@@ -38,6 +38,10 @@ object JavaVersionCheckPlugin extends sbt.AutoPlugin {
   )
 }
 
+/**
+  * Checks whether a required java specification version is satisfied by the actual java specification version.
+  * See http://docs.oracle.com/javase/7/docs/technotes/guides/versioning/spec/versioning2.html
+  */
 object JavaVersionCheck {
 
   def check(requiredJavaVersion: String, javaSpecificationVersion:String):String = {

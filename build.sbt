@@ -4,7 +4,7 @@ organization := "com.agilogy"
 
 name := "sbt-javaversion"
 
-version := "0.2.0"
+version := "0.2.1"
 
 description := "sbt plugin to check Java version"
 
